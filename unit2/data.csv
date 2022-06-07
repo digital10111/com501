@@ -1,0 +1,7 @@
+device	screen_size	makes_calls	classification
+G1	6	Yes	Phone
+S1	6	Yes	Phone
+A1	7	Yes	Phone
+G2	7	No	Tablet
+S2	7	No	Tablet
+A2	8	Yes	Tablet
