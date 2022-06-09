@@ -136,7 +136,6 @@ def cross_val_score_v2(
     """
     # To ensure multimetric format is not supported
     scorer = check_scoring(estimator, scoring=scoring)
-    print(estimator)
     cv_results = cross_validate(
         estimator=estimator,
         X=X,
