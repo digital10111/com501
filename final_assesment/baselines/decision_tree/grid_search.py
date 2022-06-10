@@ -1,13 +1,10 @@
-import numpy as np
-from matplotlib import pyplot as plt
 from sklearn.metrics import f1_score, classification_report, make_scorer
-from sklearn.model_selection import GridSearchCV, cross_val_score
+from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
-from sklearn import tree
 
 from final_assesment.baselines.cross_val_custom import cross_val_score_v2
-from final_assesment.baselines.decision_tree.get_train_test_data import get_train_test_data
+from final_assesment.data_util.get_train_test_data import get_train_test_data
 from final_assesment.baselines.decision_tree.transformers import get_categorical_pipeline, get_numerical_pipeline, \
     get_full_processeror
 

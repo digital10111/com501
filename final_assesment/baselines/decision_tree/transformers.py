@@ -3,6 +3,9 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, KBinsDiscretizer, FunctionTransformer
 
+from final_assesment.custom_transforms.cat_imputer import TargetSpecificCategoricalModeImputer
+from final_assesment.custom_transforms.column_drop import ColumnDropperTransformer
+
 
 def get_categorical_pipeline():
 
@@ -10,6 +13,22 @@ def get_categorical_pipeline():
         ('one-hot', OneHotEncoder(handle_unknown='ignore', sparse=False))
     ])
     return categorical_pipeline
+
+
+def get_drop_col_pipeline():
+
+    drop_col_pipeline = Pipeline(steps=[
+        ('drop_col', ColumnDropperTransformer())
+    ])
+    return drop_col_pipeline
+
+
+def get_imputer_pipeline():
+
+    imputer_pipeline = Pipeline(steps=[
+        ('imputer', TargetSpecificCategoricalModeImputer())
+    ])
+    return imputer_pipeline
 
 
 def get_numerical_pipeline(scale=False):
@@ -21,6 +40,14 @@ def get_numerical_pipeline(scale=False):
 
 
 def get_full_processeror(categorical_features, categorical_pipeline, numerical_features, numerical_pipeline):
+    full_processor = ColumnTransformer(transformers=[
+        ('category', categorical_pipeline, categorical_features),
+        ('numerical', numerical_pipeline, numerical_features)
+    ])
+    return full_processor
+
+
+def get_full_processeror_rfsq(categorical_features, categorical_pipeline, numerical_features, numerical_pipeline):
     full_processor = ColumnTransformer(transformers=[
         ('category', categorical_pipeline, categorical_features),
         ('numerical', numerical_pipeline, numerical_features)

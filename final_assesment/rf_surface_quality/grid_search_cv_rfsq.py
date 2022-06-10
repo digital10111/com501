@@ -4,29 +4,23 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 
 from final_assesment.baselines.cross_val_custom import cross_val_score_v2
-from final_assesment.data_util.get_train_test_data import get_train_test_data
 from final_assesment.baselines.decision_tree.transformers import get_categorical_pipeline, get_numerical_pipeline, \
-    get_full_processeror, get_imputer_pipeline, get_drop_col_pipeline
-
-
-def classification_report_with_accuracy_score(y_true, y_pred, **kwargs):
-    # estimator = kwargs['estimator']
-    print(classification_report(y_true, y_pred, zero_division=0))  # print classification report
-    print("\n***---***\n")
-    return f1_score(y_true, y_pred, average='macro')
+    get_full_processeror, get_imputer_pipeline, get_drop_col_pipeline, get_full_processeror_rfsq
+from final_assesment.randomforest.rf_grid_search import classification_report_with_accuracy_score
+from final_assesment.rf_surface_quality.get_data_rfsq import get_rfsq_train_data
 
 
 def grid_search():
     n_jobs = 40
-    X_train, X_test, y_train, y_test, data_df, X, y = get_train_test_data()
+    X_train, X_test, y_train, y_test, df, X, y, df_predict  = get_rfsq_train_data(train_data_file="../anneal.data")
     rf = RandomForestClassifier(n_jobs=n_jobs, oob_score=False)
 
     categorical_pipeline = get_categorical_pipeline()
     numerical_pipeline = get_numerical_pipeline(scale=True)
 
-    categorical_features = ["steel", "shape", "bore", "formability", "condition", "surface_quality"]
-    numerical_features = list((set(X.columns.to_list()) - set(categorical_features)) - {'target'})
-    full_datapipeline = get_full_processeror(categorical_features, categorical_pipeline, numerical_features,
+    categorical_features = ["steel", "shape", "bore", "formability"]
+    numerical_features = list((set(X.columns.to_list()) - set(categorical_features)) - {'surface_quality'})
+    full_datapipeline = get_full_processeror_rfsq(categorical_features, categorical_pipeline, numerical_features,
                                              numerical_pipeline)
     rf_pipeline = Pipeline(steps=[
         ('preprocess', full_datapipeline),
@@ -50,5 +44,4 @@ def grid_search():
     print(dir(clf))
 
 
-if __name__ == '__main__':
-    grid_search()
+grid_search()
