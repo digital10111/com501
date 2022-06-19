@@ -26,7 +26,7 @@ titan[titanic.isnull()]=0
 
 
 def plot_boundary(X, y, plot_idx, models, model, model_title):
-    plt.subplots(5, 2, plot_idx)
+    plt.subplot(5, 2, plot_idx)
     if plot_idx <= len(models):
         plt.title(model_title, fontsize=9)
 
@@ -48,10 +48,20 @@ def plot_boundary(X, y, plot_idx, models, model, model_title):
             Z = Z.reshape(xx.shape)
             cs = plt.contourf(xx, yy, Z, alpha=estimator_alpha, cmap=cmap)
 
-    pass
+    plt.show()
+
+    xx_coarser, yy_coarser = np.meshgrid(
+        np.arange(x_min, x_max, plot_step_coarser),
+        np.arange(y_min, y_max, plot_step_coarser)
+    )
+    Z_points_coarser = model.predict(np.c_[xx_coarser.ravel(), yy_coarser.ravel()]).reshape(xx_coarser.shape)
+    plt.scatter(xx_coarser, yy_coarser, s=15, c=Z_points_coarser, cmap=cmap, edgecolors='none')
+    plt.show()
+    plt.scatter(X[:, 0], X[:, 1], c=y, cmap=ListedColormap(['r', 'y', 'b']), edgecolor='k', s=20)
+    plt.show()
 
 
-def apply_DecTree_RandForest(dataname = 'titan'):
+def apply_DecTree_RandForest(dataname='titan'):
     plot_idx = 1
 
     models = [DecisionTreeClassifier(max_depth=None), RandomForestClassifier(n_estimators=n_estimators)]
@@ -91,6 +101,14 @@ def apply_DecTree_RandForest(dataname = 'titan'):
             if plot_it:
                 plot_boundary(X, y, plot_idx, models, model, model_title)
                 plot_idx += 1
+
+    plt.suptitle("Classifiers on feature subsets of the Iris dataset", fontsize=12)
+    plt.axis("tight")
+    plt.tight_layout(h_pad=0.2, w_pad=0.2, pad=2.5)
+    plt.show()
+
+
+apply_DecTree_RandForest('iris')
 
 
 

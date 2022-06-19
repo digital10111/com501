@@ -12,23 +12,20 @@ from final_assesment.rf_surface_quality.get_data_rfsq import get_rfsq_train_data
 
 def grid_search():
     n_jobs = 40
-    X_train, X_test, y_train, y_test, df, X, y, df_predict  = get_rfsq_train_data(train_data_file="../anneal.data")
+    X_train, X_test, y_train, y_test, df, X, y, df_predict = get_rfsq_train_data(train_data_file="../anneal_train.data")
     rf = RandomForestClassifier(n_jobs=n_jobs, oob_score=False)
 
-    categorical_pipeline = get_categorical_pipeline()
     numerical_pipeline = get_numerical_pipeline(scale=True)
-
     categorical_features = ["steel", "shape", "bore", "formability"]
-    numerical_features = list((set(X.columns.to_list()) - set(categorical_features)) - {'surface_quality'})
-    full_datapipeline = get_full_processeror_rfsq(categorical_features, categorical_pipeline, numerical_features,
-                                             numerical_pipeline)
+    numerical_features = ["carbon", "hardness", "strength", "thick", "width", "len"]
+    full_datapipeline = get_full_processeror_rfsq(categorical_features=categorical_features, numerical_features=numerical_features, numerical_pipeline=numerical_pipeline)
     rf_pipeline = Pipeline(steps=[
         ('preprocess', full_datapipeline),
         ('model', rf)
     ])
 
     param_grid = {
-        "model__n_estimators": [20, 40, 60, 80, 100, 120, 150, 200],
+        "model__n_estimators": [5, 10, 20, 40, 60, 80, 100, 120, 150, 200],
         "model__max_depth": [5, 10, 20, 30, 40, None],
 
     }
