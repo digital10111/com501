@@ -3,8 +3,11 @@ class NAColumnTransformer:
         self.columns = column
 
     def transform(self, X, y=None):
-        X_new = X[self.columns].fillna("NA")
-        X[self.columns] = X_new
+
+        wo_form = list(set(self.columns) - {'formability'})
+        X_new = X[wo_form].fillna("NA")
+        X[wo_form] = X_new
+        X['formability'] = X['formability'].fillna(0).astype(int)
         return X
 
     def fit(self, X, y=None):

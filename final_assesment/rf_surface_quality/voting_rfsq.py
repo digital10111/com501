@@ -1,9 +1,9 @@
+from joblib import dump, load
 from sklearn.ensemble import VotingClassifier
 from sklearn.metrics import f1_score, classification_report, make_scorer
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
-
 from final_assesment.baselines.cross_val_custom import cross_val_score_v2
 from final_assesment.baselines.decision_tree.transformers import get_categorical_pipeline, get_numerical_pipeline, get_full_processeror_rfsq
 from final_assesment.randomforest.rf_grid_search import classification_report_with_accuracy_score
@@ -33,6 +33,7 @@ cv_results = cross_val_score_v2(estimator=rf_pipeline, X=X_train, y=y_train, sco
 rf_pipeline.fit(X_train, y_train)
 y_test_pred = rf_pipeline.predict(X_test)
 classification_report_with_accuracy_score(y_test, y_test_pred)
+
 
 # df_dev[df_dev.surface_quality.isnull()]['surface_quality'] = rf_pipeline.predict(df_dev[df_dev.surface_quality.isnull()])
 # df_dev.loc[df_dev.surface_quality.isnull(), 'surface_quality'] = rf_pipeline.predict(df_dev[df_dev.surface_quality.isnull()])

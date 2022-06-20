@@ -1,6 +1,6 @@
 import pandas as pd
 from imblearn.over_sampling import SMOTENC
-from sklearn.metrics import f1_score, classification_report, make_scorer
+from sklearn.metrics import f1_score, classification_report, make_scorer, precision_score, fbeta_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
@@ -24,11 +24,24 @@ def classification_report_with_accuracy_score(y_true, y_pred, **kwargs):
     print("F1_score: ", f1_score(y_true, y_pred, average='macro'))
     print("\n***---***\n")
 
-    return f1_score(y_true, y_pred, average='macro')
+    return precision_score(y_true, y_pred, average='macro')
+
+
+def print_recall_biased_Fbeta(y_true, y_pred):
+    print(classification_report(y_true, y_pred, zero_division=0))  # print classification report
+    fbs = fbeta_score(y_true, y_pred, average='macro', beta=1.28)
+    print("F1_beta: ", fbs)
+    print("\n***---***\n")
+    return fbs
+
+
+def recall_biased_Fbeta(y_true, y_pred):
+    fbs = fbeta_score(y_true, y_pred, average='macro', beta=1.28)
+    return fbs
 
 
 def grid_search():
-    n_jobs = -1
+    n_jobs = 40
     X_train, y_train, X_val, y_val = get_train_test_data()
     rf = RandomForestClassifier(n_jobs=n_jobs, oob_score=False)
 
@@ -38,7 +51,7 @@ def grid_search():
     numerical_features = ["carbon", "hardness", "strength", "thick", "width", "len"]
     all_categorical = list(set(all_features) - set(numerical_features))
     categorical_features = ["steel", "shape", "bore", "formability", "condition", "surface_quality"]
-    na_imputer = ['bl', 'temper_rolling', 'bf', 'non_ageing', 'cbond', 'bt', 'lustre', 'ferro', 'chrom', 'phos']
+    na_imputer = ['bw_or_me', 'bl', 'temper_rolling', 'bf', 'non_ageing', 'cbond', 'bt', 'lustre', 'ferro', 'chrom', 'phos', 'condition', "surface_quality", "formability", 'oil']
     drop_categorical_features = set(all_categorical) - set(categorical_features) - set(na_imputer)
     X_train_stack = pd.concat([X_train[all_categorical], X_train[numerical_features]], axis=1)
 
@@ -59,10 +72,10 @@ def grid_search():
     }
 
     clf = GridSearchCV(estimator=rf_pipeline, param_grid=param_grid,
-                       scoring="f1_macro", cv=3, n_jobs=n_jobs, return_train_score=True)
+                       scoring=make_scorer(recall_biased_Fbeta), cv=3, n_jobs=n_jobs, return_train_score=True)
 
     cv_results = cross_val_score_v2(estimator=clf, X=X_train_stack, y=y_train,
-                                    scoring=make_scorer(classification_report_with_accuracy_score), verbose=5, n_jobs=n_jobs, cv=3)
+                                    scoring=make_scorer(print_recall_biased_Fbeta), verbose=5, n_jobs=n_jobs, cv=3)
 
     run_mean = mean(cv_results['test_score'])
     run_var = variance(cv_results['test_score'])
